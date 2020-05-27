@@ -201,7 +201,27 @@ public class SearchBuilderUtil {
 ////        highlightBuilder.numOfFragments(0);
 //
 //        searchSourceBuilder.highlighter(highlightBuilder);
+
+//        // 聚合查询
+//        TermsAggregationBuilder aggregation = AggregationBuilders.terms("by_sex").field("sex.keyword")
+//                .subAggregation(AggregationBuilders.sum("sort").field("sort"));
+//        searchSourceBuilder.aggregation(aggregation);
+
+//        // 提示
+//        CompletionSuggestionBuilder termSuggestionBuilder = SuggestBuilders.completionSuggestion("address.keyword").prefix("中国").size(20).skipDuplicates(true);
+//        SuggestBuilder suggestBuilder = new SuggestBuilder();
+//        suggestBuilder.addSuggestion("suggest", termSuggestionBuilder);
+//        searchSourceBuilder.suggest(suggestBuilder);
+
+        // 可用来对一个特定的查询操作中的请求和聚合进行分析
+//        searchSourceBuilder.profile(true);
+
         return searchSourceBuilder;
+
+    }
+
+
+    public static void main(String[] args) {
 
     }
 

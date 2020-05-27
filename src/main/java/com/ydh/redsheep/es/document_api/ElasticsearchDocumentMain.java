@@ -1,6 +1,8 @@
 package com.ydh.redsheep.es.document_api;
 
+import com.ydh.redsheep.model.entity.PersonPO;
 import com.ydh.redsheep.util.ElasticsearchConfig;
+import com.ydh.redsheep.util.JsonUtils;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -19,7 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.Random;
 
 /**
 *
@@ -33,21 +36,21 @@ public class ElasticsearchDocumentMain {
     private static RestHighLevelClient restHighLevelClient = ElasticsearchConfig.restHighLevelClient();
 
     public static void main(String[] args) throws Exception {
-//        for (int i = 0; i < 100; i++) {
-//            PersonPO personBO = new PersonPO();
-//            personBO.setName("人才"+i);
-//            personBO.setSex(i%2==0?"男":"女");
-//            personBO.setAddress("中国浙江省杭州市"+new Random().nextLong());
-//            personBO.setBirthDay(LocalDateTime.now().minusDays(i));
-//            personBO.setEmail(new Random().nextLong() +"@qq.com");
-//            personBO.setSort(i%39);
-//            IndexResponse response = createDocument("yiwise", "test", JsonUtils.object2String(personBO));
-//            String index = response.getIndex();
-//            String type = response.getType();
-//            String id = response.getId();
-//            long version = response.getVersion();
-//            System.out.println(index + "===" + id);
-//        }
+        for (int i = 0; i < 100; i++) {
+            PersonPO personBO = new PersonPO();
+            personBO.setName("人才"+i);
+            personBO.setSex(i%2==0?"男":"女");
+            personBO.setAddress("中国 浙江省 湖州市 德清县 武康镇 "+new Random().nextLong());
+            personBO.setBirthDay(LocalDateTime.now().minusDays(i));
+            personBO.setEmail(new Random().nextLong() +"@qq.com");
+            personBO.setSort(i%39);
+            IndexResponse response = createDocument("yiwise", "test", JsonUtils.object2String(personBO));
+            String index = response.getIndex();
+            String type = response.getType();
+            String id = response.getId();
+            long version = response.getVersion();
+            System.out.println(index + "===" + id);
+        }
 //
 //        GetResponse response = getDocument("yiwise", "test", "YTERS3IBLhCRLgK0wGjb");
 //        String index = response.getIndex();
@@ -98,42 +101,42 @@ public class ElasticsearchDocumentMain {
 //        long version = response.getVersion();
 //        System.out.println(index + "===" + id);
 //
-        String[] fields = {"sex", "name"};
-        TermVectorsResponse response = termVectors("yiwise", "test", "0Mc6S3IBQ5_9CYD7bU76", fields);
-        // 是否有找到匹配的
-        String index = response.getIndex();
-        String type = response.getType();
-        String id = response.getId();
-        System.out.println(index + "===" + id);
-        boolean found = response.getFound();
-        if (found) {
-            for (TermVectorsResponse.TermVector tv : response.getTermVectorsList()) {
-                String fieldname = tv.getFieldName();
-                Integer docCount = tv.getFieldStatistics().getDocCount();
-                Long sumTotalTermFreq = tv.getFieldStatistics().getSumTotalTermFreq();
-                Long sumDocFreq = tv.getFieldStatistics().getSumDocFreq();
-                if (tv.getTerms() != null) {
-                    List<TermVectorsResponse.TermVector.Term> terms = tv.getTerms();
-                    for (TermVectorsResponse.TermVector.Term term : terms) {
-                        String termStr = term.getTerm();
-                        Integer termFreq = term.getTermFreq();
-                        Integer docFreq = term.getDocFreq();
-                        Long totalTermFreq = term.getTotalTermFreq();
-                        Float score = term.getScore();
-                        if (term.getTokens() != null) {
-                            List<TermVectorsResponse.TermVector.Token> tokens = term.getTokens();
-                            for (TermVectorsResponse.TermVector.Token token : tokens) {
-                                Integer position = token.getPosition();
-                                Integer startOffset = token.getStartOffset();
-                                Integer endOffset = token.getEndOffset();
-                                String payload = token.getPayload();
-                                System.out.println(position + " " + startOffset + " " + endOffset + " " + payload);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+//        String[] fields = {"sex", "name"};
+//        TermVectorsResponse response = termVectors("yiwise", "test", "0Mc6S3IBQ5_9CYD7bU76", fields);
+//        // 是否有找到匹配的
+//        String index = response.getIndex();
+//        String type = response.getType();
+//        String id = response.getId();
+//        System.out.println(index + "===" + id);
+//        boolean found = response.getFound();
+//        if (found) {
+//            for (TermVectorsResponse.TermVector tv : response.getTermVectorsList()) {
+//                String fieldname = tv.getFieldName();
+//                Integer docCount = tv.getFieldStatistics().getDocCount();
+//                Long sumTotalTermFreq = tv.getFieldStatistics().getSumTotalTermFreq();
+//                Long sumDocFreq = tv.getFieldStatistics().getSumDocFreq();
+//                if (tv.getTerms() != null) {
+//                    List<TermVectorsResponse.TermVector.Term> terms = tv.getTerms();
+//                    for (TermVectorsResponse.TermVector.Term term : terms) {
+//                        String termStr = term.getTerm();
+//                        Integer termFreq = term.getTermFreq();
+//                        Integer docFreq = term.getDocFreq();
+//                        Long totalTermFreq = term.getTotalTermFreq();
+//                        Float score = term.getScore();
+//                        if (term.getTokens() != null) {
+//                            List<TermVectorsResponse.TermVector.Token> tokens = term.getTokens();
+//                            for (TermVectorsResponse.TermVector.Token token : tokens) {
+//                                Integer position = token.getPosition();
+//                                Integer startOffset = token.getStartOffset();
+//                                Integer endOffset = token.getEndOffset();
+//                                String payload = token.getPayload();
+//                                System.out.println(position + " " + startOffset + " " + endOffset + " " + payload);
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
 
         restHighLevelClient.close();
     }

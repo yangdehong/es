@@ -3,7 +3,6 @@ package com.ydh.redsheep.es.search_api;
 import com.ydh.redsheep.model.EsMultiSearchBO;
 import com.ydh.redsheep.model.EsSearchPageBO;
 import com.ydh.redsheep.model.EsSearchScrollBO;
-import com.ydh.redsheep.model.ParamFieldBO;
 import com.ydh.redsheep.util.ElasticsearchConfig;
 import com.ydh.redsheep.util.SearchBuilderUtil;
 import org.elasticsearch.action.search.*;
@@ -40,10 +39,10 @@ public class ElasticsearchSearch {
 //        esSearchPageBO.setIncludeFields(includeFields);
 //        esSearchPageBO.setExcludeFields(excludeFields);
 
-        ParamFieldBO termField = new ParamFieldBO();
-        termField.setFieldName("name.keyword");
-        termField.setValue("人才3");
-        esSearchPageBO.setTermField(termField);
+//        ParamFieldBO termField = new ParamFieldBO();
+//        termField.setFieldName("name.keyword");
+//        termField.setValue("人才3");
+//        esSearchPageBO.setTermField(termField);
 
 //        ParamFieldBO prefixField = new ParamFieldBO();
 //        prefixField.setFieldName("name.keyword");
@@ -94,8 +93,18 @@ public class ElasticsearchSearch {
         SearchHits hits = response.getHits();
         for (SearchHit hit : hits) {
             System.out.println(hit.getSourceAsString());
+            // 高亮
 //            System.out.println(hit.getHighlightFields());
         }
+
+//        // 聚合
+//        Aggregation sort = response.getAggregations().get("by_sex");
+//        System.out.println(sort);
+
+//        // 提示
+//        Suggest.Suggestion<? extends Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option>> suggest_address = response.getSuggest().getSuggestion("suggest_address");
+//        System.out.println(suggest_address);
+
 
 //        EsSearchScrollBO esSearchScrollBO = new EsSearchScrollBO();
 //        esSearchScrollBO.setIndex("yiwise_test");
