@@ -187,24 +187,19 @@ public class ElasticsearchSearch {
         SearchRequest request = new SearchRequest(esSearchPageBO.getIndex());
         request.types(esSearchPageBO.getType());
         SearchSourceBuilder searchSourceBuilder = SearchBuilderUtil.getSearchBuilder(esSearchPageBO);
-
         if (esSearchPageBO.getFrom() != null) {
             searchSourceBuilder.from(esSearchPageBO.getFrom());
         }
         if (esSearchPageBO.getSize() != null) {
             searchSourceBuilder.size(esSearchPageBO.getSize());
         }
-
         request.source(searchSourceBuilder);
-
-
         try {
             SearchResponse searchResponse = restHighLevelClient.search(request, RequestOptions.DEFAULT);
             return searchResponse;
         } catch (IOException e) {
             logger.error("search所有的时候错误", e);
         }
-
         return null;
     }
 
@@ -215,21 +210,18 @@ public class ElasticsearchSearch {
      * @return
      */
     public static SearchResponse searchScroll(EsSearchScrollBO esSearchScrollBO, Scroll scroll) {
-
         SearchRequest searchRequest = new SearchRequest(esSearchScrollBO.getIndex());
         searchRequest.types(esSearchScrollBO.getType());
         searchRequest.scroll(scroll);
         SearchSourceBuilder searchSourceBuilder = SearchBuilderUtil.getSearchBuilder(esSearchScrollBO);
         searchSourceBuilder.size(esSearchScrollBO.getSize());
         searchRequest.source(searchSourceBuilder);
-
         try {
             SearchResponse response = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
             return response;
         } catch (IOException e) {
             logger.error("启用scroll错误", e);
         }
-
         return null;
     }
     /**
@@ -255,7 +247,6 @@ public class ElasticsearchSearch {
      * @return
      */
     public static ClearScrollResponse clearScroll(String scrollId) {
-
         ClearScrollRequest request = new ClearScrollRequest();
         request.addScrollId(scrollId);
         try {
@@ -264,7 +255,6 @@ public class ElasticsearchSearch {
         } catch (IOException e) {
             logger.error("清理scroll错误", e);
         }
-
         return null;
     }
 
