@@ -18,7 +18,6 @@ import java.io.Serializable;
 @ToString(callSuper = true)
 public class EsSearchPageBO extends EsSearchBaseBO implements Serializable {
 
-
     /**
      * 分页开始
      */
@@ -27,7 +26,5 @@ public class EsSearchPageBO extends EsSearchBaseBO implements Serializable {
      * 每页条数
      */
     private Integer size = 100;
-
-
 
 }

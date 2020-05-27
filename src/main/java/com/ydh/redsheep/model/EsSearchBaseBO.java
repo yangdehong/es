@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.elasticsearch.common.unit.Fuzziness;
 import org.elasticsearch.search.sort.SortOrder;
 
 import java.io.Serializable;
@@ -36,31 +35,50 @@ public class EsSearchBaseBO extends EsBaseBO implements Serializable {
     /**
      * 完全匹配
      */
-    private Map<String, Object> fullMatchField;
+    private ParamFieldBO termField;
     /**
-     *
+     * 前缀匹配
      */
-    private EsParamsRangeBO esParamsRangeBO;
+    private ParamFieldBO prefixField;
     /**
-     * 模糊匹配
+     * 模糊匹配，下面的4个参数都是用来匹配fuzzy的
      */
-    private Map<String, String> fuzzyField;
+    private ParamFieldFuzzyBO fuzzyField;
+    /**
+     * 短语匹配
+     */
+    private ParamFieldBO phraseField;
+    /**
+     * 短语匹配（前缀）
+     */
+    private ParamFieldBO phrasePrefixField;
+    /**
+     * 短语匹配（前缀）
+     */
+    private ParamFieldBO matchField;
+    /**
+     * 范围匹配
+     */
+    private EsRangeBO esRangeBO;
+    /**
+     * 是否存在匹配
+     */
+    private String existsField;
+    /**
+     * 正则匹配
+     */
+    private ParamFieldBO regexpField;
 
-    /**
-     * 模糊程度设置成1位
-     */
-    private Fuzziness fuzziness = Fuzziness.ONE;
 
-    /**
-     * 不能被 “模糊化” 的初始字符数
-     */
-    private Integer prefixLength = 0;
 
-    /**
-     * 如果一个模糊查询扩展了三个或四个模糊选项， 这些新的模糊选项也许是有意义的。如 果它产生 1000 个模糊选项，那么就基本没有意义了。
-     * 设置 max_expansions 用来限制将产生的模糊选项的总数量。模糊查询将收集匹配词项直到达到 max_expansions 的限制
-     */
-    private Integer maxExpansions = 50;
+
+
+
+
+
+
+
+
 
     /**
      * bool的条件值，现在只用filter

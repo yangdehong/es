@@ -12,12 +12,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EsParamsRangeBO<T> {
+public class EsRangeBO<T> {
 
     private String filedName;
 
-    private T minData;
+    private T minValue;
 
-    private T maxData;
+    private T maxValue;
 
 }

@@ -1,5 +1,6 @@
-package com.ydh.redsheep.es;
+package com.ydh.redsheep.es.document_api;
 
+import com.ydh.redsheep.util.ElasticsearchConfig;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -18,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
 *
@@ -32,13 +34,14 @@ public class ElasticsearchDocumentMain {
 
     public static void main(String[] args) throws Exception {
 //        for (int i = 0; i < 100; i++) {
-//            JsonObject jsonObject = new JsonObject();
-//            jsonObject.addProperty("name", "小天才"+i);
-//            jsonObject.addProperty("sex", i%2==0?"男":"女");
-//            jsonObject.addProperty("age", i%100);
-//            jsonObject.addProperty("date", LocalDateTime.now().minusDays(i).toString());
-//            jsonObject.addProperty("email", new Random().nextLong() +"@qq.com");
-//            IndexResponse response = createDocument("yiwise", "person", jsonObject.toString());
+//            PersonPO personBO = new PersonPO();
+//            personBO.setName("人才"+i);
+//            personBO.setSex(i%2==0?"男":"女");
+//            personBO.setAddress("中国浙江省杭州市"+new Random().nextLong());
+//            personBO.setBirthDay(LocalDateTime.now().minusDays(i));
+//            personBO.setEmail(new Random().nextLong() +"@qq.com");
+//            personBO.setSort(i%39);
+//            IndexResponse response = createDocument("yiwise", "test", JsonUtils.object2String(personBO));
 //            String index = response.getIndex();
 //            String type = response.getType();
 //            String id = response.getId();
@@ -46,7 +49,7 @@ public class ElasticsearchDocumentMain {
 //            System.out.println(index + "===" + id);
 //        }
 //
-//        GetResponse response = getDocument("yiwise", "person", "egGa-20BLhCRLgK0yoba");
+//        GetResponse response = getDocument("yiwise", "test", "YTERS3IBLhCRLgK0wGjb");
 //        String index = response.getIndex();
 //        String type = response.getType();
 //        String id = response.getId();
@@ -58,11 +61,10 @@ public class ElasticsearchDocumentMain {
 //            System.out.println(sourceAsString);
 //        }
 //
-//        boolean exists = existsDocument("yiwise", "person", "egGa-20BLhCRLgK0yoba");
+//        boolean exists = existsDocument("yiwise", "test", "YTERS3IBLhCRLgK0wGjb");
 //        System.out.println(exists);
 //
-//        DeleteResponse response = deleteDocument("yiwise", "person", "HQGa-20BLhCRLgK0w4ZV");
-//
+//        DeleteResponse response = deleteDocument("yiwise", "test", "ajERS3IBLhCRLgK0wWiC");
 //        String index = response.getIndex();
 //        String type = response.getType();
 //        String id = response.getId();
@@ -70,84 +72,68 @@ public class ElasticsearchDocumentMain {
 //        ReplicationResponse.ShardInfo shardInfo = response.getShardInfo();
 //        System.out.println(index + "===" + id);
 //
-//        JsonObject jsonObject = new JsonObject();
-//        jsonObject.addProperty("name", "yiwise");
-//        jsonObject.addProperty("sex", "男");
-//        jsonObject.addProperty("age", 0);
-//        jsonObject.addProperty("date", LocalDateTime.now().toString());
-//        jsonObject.addProperty("email", "yiwise@aliyun.com");
-//        UpdateResponse response = updateDocument("yiwise", "person", "FwGa-20BLhCRLgK0wobS", jsonObject.toString());
+//        PersonPO personBO = new PersonPO();
+//        personBO.setName("杨德宏");
+//        personBO.setSex("男");
+//        personBO.setAddress("中国浙江省杭州市88888888");
+//        personBO.setBirthDay(LocalDateTime.now());
+//        personBO.setEmail("987654321@qq.com");
+//        UpdateResponse response = updateDocument("yiwise", "test", "YTERS3IBLhCRLgK0wGjb", JsonUtils.object2String(personBO));
 //        String index = response.getIndex();
 //        String type = response.getType();
 //        String id = response.getId();
 //        long version = response.getVersion();
 //        System.out.println(index + "===" + id);
-//        if (response.getResult() == DocWriteResponse.Result.CREATED) {
 //
-//        } else if (response.getResult() == DocWriteResponse.Result.UPDATED) {
-//
-//        } else if (response.getResult() == DocWriteResponse.Result.DELETED) {
-//
-//        } else if (response.getResult() == DocWriteResponse.Result.NOOP) {
-//
-//        }
-//
-//        JsonObject jsonObject = new JsonObject();
-//        jsonObject.addProperty("name", "yiwise");
-//        jsonObject.addProperty("sex", "男");
-//        jsonObject.addProperty("age", 0);
-//        jsonObject.addProperty("date", LocalDateTime.now().toString());
-//        jsonObject.addProperty("email", "yiwise@aliyun.com");
-//
-//        UpdateResponse response = upsertDocument("yiwise", "person", "1", jsonObject.toString());
+//        PersonPO personBO = new PersonPO();
+//        personBO.setName("杨德宏");
+//        personBO.setSex("男");
+//        personBO.setAddress("中国浙江省杭州市999999999");
+//        personBO.setBirthDay(LocalDateTime.now());
+//        personBO.setEmail("987654321@qq.com");
+//        UpdateResponse response = upsertDocument("yiwise", "test", "1", JsonUtils.object2String(personBO));
 //        String index = response.getIndex();
 //        String type = response.getType();
 //        String id = response.getId();
 //        long version = response.getVersion();
 //        System.out.println(index + "===" + id);
-//        if (response.getResult() == DocWriteResponse.Result.CREATED) {
 //
-//        } else if (response.getResult() == DocWriteResponse.Result.UPDATED) {
-//
-//        } else if (response.getResult() == DocWriteResponse.Result.DELETED) {
-//
-//        } else if (response.getResult() == DocWriteResponse.Result.NOOP) {
-//
-//        }
-//
-//        TermVectorsResponse response = termVectors("yiwise", "person", "IQGa-20BLhCRLgK0w4aW", "sex");
-//        String index = response.getIndex();
-//        String type = response.getType();
-//        String id = response.getId();
-//        boolean found = response.getFound();
-//        for (TermVectorsResponse.TermVector tv : response.getTermVectorsList()) {
-//            String fieldname = tv.getFieldName();
-//            int docCount = tv.getFieldStatistics().getDocCount();
-//            long sumTotalTermFreq = tv.getFieldStatistics().getSumTotalTermFreq();
-//            long sumDocFreq = tv.getFieldStatistics().getSumDocFreq();
-//            if (tv.getTerms() != null) {
-//                List<TermVectorsResponse.TermVector.Term> terms = tv.getTerms();
-//                for (TermVectorsResponse.TermVector.Term term : terms) {
-//                    String termStr = term.getTerm();
-//                    int termFreq = term.getTermFreq();
-//                    int docFreq = term.getDocFreq();
-//                    long totalTermFreq = term.getTotalTermFreq();
-//                    float score = term.getScore();
-//                    if (term.getTokens() != null) {
-//                        List<TermVectorsResponse.TermVector.Token> tokens = term.getTokens();
-//                        for (TermVectorsResponse.TermVector.Token token : tokens) {
-//                            int position = token.getPosition();
-//                            int startOffset = token.getStartOffset();
-//                            int endOffset = token.getEndOffset();
-//                            String payload = token.getPayload();
-//                            System.out.println(position + " " + startOffset + " " + endOffset + " " + payload);
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
-
+        String[] fields = {"sex", "name"};
+        TermVectorsResponse response = termVectors("yiwise", "test", "0Mc6S3IBQ5_9CYD7bU76", fields);
+        // 是否有找到匹配的
+        String index = response.getIndex();
+        String type = response.getType();
+        String id = response.getId();
+        System.out.println(index + "===" + id);
+        boolean found = response.getFound();
+        if (found) {
+            for (TermVectorsResponse.TermVector tv : response.getTermVectorsList()) {
+                String fieldname = tv.getFieldName();
+                Integer docCount = tv.getFieldStatistics().getDocCount();
+                Long sumTotalTermFreq = tv.getFieldStatistics().getSumTotalTermFreq();
+                Long sumDocFreq = tv.getFieldStatistics().getSumDocFreq();
+                if (tv.getTerms() != null) {
+                    List<TermVectorsResponse.TermVector.Term> terms = tv.getTerms();
+                    for (TermVectorsResponse.TermVector.Term term : terms) {
+                        String termStr = term.getTerm();
+                        Integer termFreq = term.getTermFreq();
+                        Integer docFreq = term.getDocFreq();
+                        Long totalTermFreq = term.getTotalTermFreq();
+                        Float score = term.getScore();
+                        if (term.getTokens() != null) {
+                            List<TermVectorsResponse.TermVector.Token> tokens = term.getTokens();
+                            for (TermVectorsResponse.TermVector.Token token : tokens) {
+                                Integer position = token.getPosition();
+                                Integer startOffset = token.getStartOffset();
+                                Integer endOffset = token.getEndOffset();
+                                String payload = token.getPayload();
+                                System.out.println(position + " " + startOffset + " " + endOffset + " " + payload);
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         restHighLevelClient.close();
     }
@@ -310,7 +296,7 @@ public class ElasticsearchDocumentMain {
      * @param field
      * @return
      */
-    public static TermVectorsResponse termVectors(String key, String type, String id, String field) {
+    public static TermVectorsResponse termVectors(String key, String type, String id, String[] field) {
         TermVectorsRequest request = new TermVectorsRequest(key, type, id);
         request.setFields(field);
         try {

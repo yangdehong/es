@@ -1,4 +1,4 @@
-package com.ydh.redsheep.es;
+package com.ydh.redsheep.util;
 
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;

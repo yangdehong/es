@@ -1,5 +1,6 @@
-package com.ydh.redsheep.es;
+package com.ydh.redsheep.es.document_api;
 
+import com.ydh.redsheep.util.ElasticsearchConfig;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

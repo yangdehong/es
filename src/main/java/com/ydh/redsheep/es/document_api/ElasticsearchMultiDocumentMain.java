@@ -1,15 +1,24 @@
-package com.ydh.redsheep.es;
+package com.ydh.redsheep.es.document_api;
 
 import com.ydh.redsheep.model.EsBaseBO;
 import com.ydh.redsheep.model.EsBulkBO;
 import com.ydh.redsheep.model.EsOptBulkBO;
+import com.ydh.redsheep.model.entity.PersonPO;
+import com.ydh.redsheep.util.ElasticsearchConfig;
+import com.ydh.redsheep.util.JsonUtils;
+import org.elasticsearch.action.DocWriteRequest;
+import org.elasticsearch.action.DocWriteResponse;
+import org.elasticsearch.action.bulk.BulkItemResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.get.MultiGetRequest;
 import org.elasticsearch.action.get.MultiGetResponse;
 import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.core.TermVectorsResponse;
@@ -22,9 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.util.*;
 
 /**
 *
@@ -38,43 +46,42 @@ public class ElasticsearchMultiDocumentMain {
     private static RestHighLevelClient restHighLevelClient = ElasticsearchConfig.restHighLevelClient();
 
     public static void main(String[] args) throws Exception {
-//        List<EsBulkBO> list = new ArrayList<>();
-//        String index = "yiwise";
-//        String type = "person";
-//        for (int i = 0; i < 100; i++) {
-//            JsonObject jsonObject = new JsonObject();
-//            jsonObject.addProperty("name", "测试"+i%19);
-//            jsonObject.addProperty("sex", i%2==0?"男":"女");
-//            jsonObject.addProperty("age", i%100);
-//            jsonObject.addProperty("date", LocalDateTime.now().minusDays(i).toString());
-//            jsonObject.addProperty("email", new Random().nextLong() +"@163.com");
-//            EsBulkBO esBulkBO = new EsBulkBO(DocWriteRequest.OpType.INDEX, jsonObject.toString());
-//            esBulkBO.setIndex(index);
-//            esBulkBO.setType(type);
-//            esBulkBO.setId(i+"");
-//            list.add(esBulkBO);
-//        }
-//        BulkResponse response = bulk(list);
-//        for (BulkItemResponse bulkItemResponse : response) {
-//            DocWriteResponse itemResponse = bulkItemResponse.getResponse();
-//            switch (bulkItemResponse.getOpType()) {
-//                case INDEX:
-//                    System.out.println("11111");
-//                    break;
-//                case CREATE:
-//                    System.out.println("22222");
-//                    break;
-//                case UPDATE:
-//                    System.out.println("33333");
-//                    break;
-//                case DELETE:
-//                    System.out.println("44444");
-//                    break;
-//            }
-//        }
-
-
-
+        List<EsBulkBO> list = new ArrayList<>();
+        String index = "yiwise";
+        String type = "test";
+        for (int i = 0; i < 100; i++) {
+            PersonPO personPO = new PersonPO();
+            personPO.setName("人才"+i);
+            personPO.setSex(i%2==0?"男":"女");
+            personPO.setAddress("中国浙江省杭州市"+new Random().nextLong());
+            personPO.setBirthDay(LocalDateTime.now().minusDays(i));
+            personPO.setEmail(new Random().nextLong() +"@qq.com");
+            personPO.setSort(i%39);
+            EsBulkBO esBulkBO = new EsBulkBO(DocWriteRequest.OpType.INDEX, JsonUtils.object2String(personPO));
+            esBulkBO.setIndex(index);
+            esBulkBO.setType(type);
+            esBulkBO.setId(i+"");
+            list.add(esBulkBO);
+        }
+        BulkResponse response = bulk(list);
+        for (BulkItemResponse bulkItemResponse : response) {
+            DocWriteResponse itemResponse = bulkItemResponse.getResponse();
+            switch (bulkItemResponse.getOpType()) {
+                case INDEX:
+                case CREATE:
+                    IndexResponse indexResponse = (IndexResponse) itemResponse;
+                    System.out.println(indexResponse);
+                    break;
+                case UPDATE:
+                    UpdateResponse updateResponse = (UpdateResponse) itemResponse;
+                    System.out.println(updateResponse);
+                    break;
+                case DELETE:
+                    DeleteResponse deleteResponse = (DeleteResponse) itemResponse;
+                    System.out.println(deleteResponse);
+                    break;
+            }
+        }
 
 
         restHighLevelClient.close();

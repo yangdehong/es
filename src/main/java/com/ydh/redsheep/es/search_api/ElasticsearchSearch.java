@@ -1,20 +1,23 @@
-package com.ydh.redsheep.es;
+package com.ydh.redsheep.es.search_api;
 
-import com.ydh.redsheep.model.*;
+import com.ydh.redsheep.model.EsMultiSearchBO;
+import com.ydh.redsheep.model.EsSearchPageBO;
+import com.ydh.redsheep.model.EsSearchScrollBO;
+import com.ydh.redsheep.model.ParamFieldBO;
+import com.ydh.redsheep.util.ElasticsearchConfig;
+import com.ydh.redsheep.util.SearchBuilderUtil;
 import org.elasticsearch.action.search.*;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.Scroll;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 public class ElasticsearchSearch {
 
@@ -22,47 +25,76 @@ public class ElasticsearchSearch {
 
     private static RestHighLevelClient restHighLevelClient = ElasticsearchConfig.restHighLevelClient();
 
-    public static void main(String[] args) {
-//        EsSearchPageBO esSearchPageBO = new EsSearchPageBO();
-//        esSearchPageBO.setIndex("customer_test");
-//        esSearchPageBO.setType("customer_level_tag");
-//        esSearchPageBO.setFrom(0);
-//        esSearchPageBO.setSize(100);
-////        Map<String, SortOrder> sortFiled = new LinkedHashMap<>();
-////        sortFiled.put("age", SortOrder.ASC);
-////        sortFiled.put("sex.keyword", SortOrder.ASC);
-////        esSearchPageBO.setSortFiled(sortFiled);
-////        String[] includeFields = new String[] {"name", "sex", "age", "email"};
-////        String[] excludeFields = new String[] {"email"};
-////        esSearchPageBO.setIncludeFields(includeFields);
-////        esSearchPageBO.setExcludeFields(excludeFields);
-////        Map<String, Object> fullMatchField = new HashMap<>();
-////        fullMatchField.put("tenantId", "916");
-////        esSearchPageBO.setFullMatchField(fullMatchField);
-////        Map<String, String> queryField = new HashMap<>();
-////        queryField.put("name", "天才1");
-////        esSearchPageBO.setFuzzyField(queryField);
-//        Map<String, Object> filterFiled = new HashMap<>();
-//        List<Integer> list = new ArrayList<>();
-//        list.add(3);
-//        filterFiled.put("customerLevelTags", list);
-//        filterFiled.put("tenantId", 916);
-//        Map<String, Object> shouldFiled = new HashMap<>();
-//        List<Integer> list2 = new ArrayList<>();
-//        list2.add(1243);
-//        list2.add(1143);
-//        shouldFiled.put("followUserId", list2);
-////        EsParamsRangeBO esParamsRangeBO = new EsParamsRangeBO("age.keyword", 3, 8);
-////        filterFiled.put("age", esParamsRangeBO);
-//
+    public static void main(String[] args) throws Exception {
+        EsSearchPageBO esSearchPageBO = new EsSearchPageBO();
+        esSearchPageBO.setIndex("yiwise");
+        esSearchPageBO.setType("test");
+        esSearchPageBO.setFrom(0);
+        esSearchPageBO.setSize(10);
+//        Map<String, SortOrder> sortFiled = new LinkedHashMap<>();
+//        sortFiled.put("sort", SortOrder.ASC);
+//        esSearchPageBO.setSortFiled(sortFiled);
+
+//        String[] includeFields = new String[] {"name", "sex", "age", "email"};
+//        String[] excludeFields = new String[] {"email"};
+//        esSearchPageBO.setIncludeFields(includeFields);
+//        esSearchPageBO.setExcludeFields(excludeFields);
+
+//        ParamFieldBO termField = new ParamFieldBO();
+//        termField.setFieldName("name.keyword");
+//        termField.setValue("人才3");
+//        esSearchPageBO.setTermField(termField);
+
+//        ParamFieldBO prefixField = new ParamFieldBO();
+//        prefixField.setFieldName("name.keyword");
+//        prefixField.setValue("人才3");
+//        esSearchPageBO.setPrefixField(prefixField);
+
+//        ParamFieldFuzzyBO fuzzyField = new ParamFieldFuzzyBO();
+//        fuzzyField.setFieldName("name.keyword");
+//        fuzzyField.setValue("人才3");
+//        fuzzyField.setFuzziness(Fuzziness.ONE);
+//        fuzzyField.setPrefixLength(0);
+//        fuzzyField.setMaxExpansions(50);
+//        esSearchPageBO.setFuzzyField(fuzzyField);
+
+//        ParamFieldBO phraseField = new ParamFieldBO();
+//        phraseField.setFieldName("address.keyword");
+//        phraseField.setValue("中国浙江省杭州市-4583156876345471917");
+//        esSearchPageBO.setPhraseField(phraseField);
+
+//        ParamFieldBO phrasePrefixField = new ParamFieldBO();
+//        phrasePrefixField.setFieldName("address.keyword");
+//        phrasePrefixField.setValue("中国浙江省杭州市-4583156876345471917");
+//        esSearchPageBO.setPhraseField(phrasePrefixField);
+
+//        ParamFieldBO matchField = new ParamFieldBO();
+//        matchField.setFieldName("address");
+//        matchField.setValue("中国杭州市");
+//        esSearchPageBO.setMatchField(matchField);
+
+//        EsRangeBO esRangeBO = new EsRangeBO();
+//        esRangeBO.setFiledName("sort");
+//        esRangeBO.setMaxValue(3);
+//        esRangeBO.setMinValue(3);
+//        esSearchPageBO.setEsRangeBO(esRangeBO);
+
+//        esSearchPageBO.setExistsField("name1");
+
+        ParamFieldBO regexField = new ParamFieldBO();
+        regexField.setFieldName("address.keyword");
+        regexField.setValue(".*杭州市.*");
+        esSearchPageBO.setRegexpField(regexField);
+
+
 //        esSearchPageBO.setFilterFiled(filterFiled);
 //        esSearchPageBO.setShouldFiled(shouldFiled);
-//
-//        SearchResponse response = searchCondition(esSearchPageBO);
-//        SearchHits hits = response.getHits();
-//        for (SearchHit hit : hits) {
-//            System.out.println(hit.getSourceAsString());
-//        }
+
+        SearchResponse response = searchCondition(esSearchPageBO);
+        SearchHits hits = response.getHits();
+        for (SearchHit hit : hits) {
+            System.out.println(hit.getSourceAsString());
+        }
 
 //        EsSearchScrollBO esSearchScrollBO = new EsSearchScrollBO();
 //        esSearchScrollBO.setIndex("yiwise_test");
@@ -139,6 +171,8 @@ public class ElasticsearchSearch {
 //            }
 //        }
 
+        restHighLevelClient.close();
+
     }
 
 
@@ -151,8 +185,7 @@ public class ElasticsearchSearch {
     public static SearchResponse searchCondition(EsSearchPageBO esSearchPageBO) {
         SearchRequest request = new SearchRequest(esSearchPageBO.getIndex());
         request.types(esSearchPageBO.getType());
-
-        SearchSourceBuilder searchSourceBuilder = getSearchBuilder(esSearchPageBO);
+        SearchSourceBuilder searchSourceBuilder = SearchBuilderUtil.getSearchBuilder(esSearchPageBO);
 
         if (esSearchPageBO.getFrom() != null) {
             searchSourceBuilder.from(esSearchPageBO.getFrom());
@@ -185,7 +218,7 @@ public class ElasticsearchSearch {
         SearchRequest searchRequest = new SearchRequest(esSearchScrollBO.getIndex());
         searchRequest.types(esSearchScrollBO.getType());
         searchRequest.scroll(scroll);
-        SearchSourceBuilder searchSourceBuilder = getSearchBuilder(esSearchScrollBO);
+        SearchSourceBuilder searchSourceBuilder = SearchBuilderUtil.getSearchBuilder(esSearchScrollBO);
         searchSourceBuilder.size(esSearchScrollBO.getSize());
         searchRequest.source(searchSourceBuilder);
 
@@ -241,7 +274,7 @@ public class ElasticsearchSearch {
             SearchRequest request = new SearchRequest(esMultiSearchBO.getIndex());
             request.types(esMultiSearchBO.getType());
 
-            SearchSourceBuilder searchSourceBuilder = getSearchBuilder(esMultiSearchBO);
+            SearchSourceBuilder searchSourceBuilder = SearchBuilderUtil.getSearchBuilder(esMultiSearchBO);
 
             if (esMultiSearchBO.getFrom() != null) {
                 searchSourceBuilder.from(esMultiSearchBO.getFrom());
@@ -263,103 +296,6 @@ public class ElasticsearchSearch {
         }
 
         return null;
-    }
-
-    /**
-     * 构建查询条件对象
-     * @param esSearchBaseBO
-     * @return
-     */
-    private static SearchSourceBuilder getSearchBuilder(EsSearchBaseBO esSearchBaseBO) {
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        if (esSearchBaseBO.getFullMatchField() == null && esSearchBaseBO.getFuzzyField() == null) {
-            searchSourceBuilder.query(QueryBuilders.matchAllQuery());
-        } else {
-            if (esSearchBaseBO.getFullMatchField() != null) {
-                Map<String, Object> fullMatchField = esSearchBaseBO.getFullMatchField();
-                for (String field : fullMatchField.keySet()) {
-                    Object value = fullMatchField.get(field);
-                    QueryBuilder queryBuilder = QueryBuilders.matchPhraseQuery(field, value);
-                    searchSourceBuilder.query(queryBuilder);
-                }
-            }
-            if (esSearchBaseBO.getFuzzyField() != null) {
-                Map<String, String> fuzzyField = esSearchBaseBO.getFuzzyField();
-                for (String field : fuzzyField.keySet()) {
-                    Object value = fuzzyField.get(field);
-                    QueryBuilder queryBuilder = QueryBuilders.fuzzyQuery(field, value).fuzziness(esSearchBaseBO.getFuzziness())
-                            .prefixLength(esSearchBaseBO.getPrefixLength()).maxExpansions(esSearchBaseBO.getMaxExpansions());
-                    searchSourceBuilder.query(queryBuilder);
-                }
-            }
-        }
-
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        Map<String, Object> filterFiled = esSearchBaseBO.getFilterFiled();
-        if (filterFiled != null) {
-            for (String key : filterFiled.keySet()) {
-                Object o = filterFiled.get(key);
-                if (o instanceof List) {
-                    List list = (List) o;
-                    list.forEach(item -> {
-                        MatchPhraseQueryBuilder filter = QueryBuilders.matchPhraseQuery(key, item);
-                        boolQueryBuilder.filter(filter);
-                    });
-                } else if (o instanceof EsParamsRangeBO) {
-                    EsParamsRangeBO esParamsRangeBO = (EsParamsRangeBO) o;
-                    Object minData = esParamsRangeBO.getMinData();
-                    Object maxData = esParamsRangeBO.getMaxData();
-                    if (Objects.nonNull(maxData) || Objects.nonNull(minData)) {
-                        RangeQueryBuilder range = QueryBuilders.rangeQuery(key);
-                        if (Objects.nonNull(maxData)) {
-                            range.lt(maxData);
-                        }
-                        if (Objects.nonNull(minData)) {
-                            range.gt(minData);
-                        }
-                        boolQueryBuilder.filter(range);
-                    }
-                } else {
-                    MatchPhraseQueryBuilder filter = QueryBuilders.matchPhraseQuery(key, o);
-                    boolQueryBuilder.filter(filter);
-                }
-            }
-        }
-        Map<String, Object> shouldFiled = esSearchBaseBO.getShouldFiled();
-        if (shouldFiled != null) {
-            BoolQueryBuilder shouldBoolQueryBuilder = QueryBuilders.boolQuery();
-            for (String key : shouldFiled.keySet()) {
-                Object o = shouldFiled.get(key);
-                if (o instanceof List) {
-                    List list = (List) o;
-                    list.forEach(item -> {
-                        MatchPhraseQueryBuilder filter = QueryBuilders.matchPhraseQuery(key, item);
-                        shouldBoolQueryBuilder.should(filter);
-                    });
-                }  else {
-                    MatchPhraseQueryBuilder filter = QueryBuilders.matchPhraseQuery(key, o);
-                    shouldBoolQueryBuilder.should(filter);
-                }
-            }
-            boolQueryBuilder.filter(shouldBoolQueryBuilder);
-        }
-        searchSourceBuilder.query(boolQueryBuilder);
-
-        if (esSearchBaseBO.getSortFiled() != null) {
-            Map<String, SortOrder> sortFiled = esSearchBaseBO.getSortFiled();
-            for (String key : sortFiled.keySet()) {
-                SortOrder sortOrder = sortFiled.get(key);
-                searchSourceBuilder.sort(key, Objects.isNull(sortOrder)?SortOrder.ASC:sortOrder);
-            }
-        }
-        if (esSearchBaseBO.getIncludeFields() != null || esSearchBaseBO.getExcludeFields() != null) {
-            String[] includeFields = esSearchBaseBO.getIncludeFields();
-            String[] excludeFields = esSearchBaseBO.getExcludeFields();
-            searchSourceBuilder.fetchSource(includeFields, excludeFields);
-        }
-
-        return searchSourceBuilder;
-
     }
 
 }
