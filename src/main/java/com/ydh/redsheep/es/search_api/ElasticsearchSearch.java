@@ -1,14 +1,12 @@
 package com.ydh.redsheep.es.search_api;
 
-import com.ydh.redsheep.model.EsMultiSearchBO;
 import com.ydh.redsheep.model.EsSearchPageBO;
-import com.ydh.redsheep.model.EsSearchScrollBO;
 import com.ydh.redsheep.util.ElasticsearchConfig;
 import com.ydh.redsheep.util.SearchBuilderUtil;
-import org.elasticsearch.action.search.*;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.search.Scroll;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -16,7 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.List;
 
 public class ElasticsearchSearch {
 
@@ -105,82 +102,6 @@ public class ElasticsearchSearch {
 //        Suggest.Suggestion<? extends Suggest.Suggestion.Entry<? extends Suggest.Suggestion.Entry.Option>> suggest_address = response.getSuggest().getSuggestion("suggest_address");
 //        System.out.println(suggest_address);
 
-
-//        EsSearchScrollBO esSearchScrollBO = new EsSearchScrollBO();
-//        esSearchScrollBO.setIndex("yiwise_test");
-//        esSearchScrollBO.setType("person");
-//        esSearchScrollBO.setSize(100);
-////        Map<String, SortOrder> sortFiled = new LinkedHashMap<>();
-////        sortFiled.put("sex.keyword", null);
-////        sortFiled.put("age", SortOrder.ASC);
-////        esSearchScrollBO.setSortFiled(sortFiled);
-////        String[] includeFields = new String[] {"name", "sex", "age", "email"};
-////        String[] excludeFields = new String[] {"email"};
-////        esSearchScrollBO.setIncludeFields(includeFields);
-////        esSearchScrollBO.setExcludeFields(excludeFields);
-//////        Map<String, Object> fullMatchField = new HashMap<>();
-//////        fullMatchField.put("name", "yiwise");
-//////        esSearchScrollBO.setFullMatchField(fullMatchField);
-////        Map<String, String> queryField = new HashMap<>();
-////        queryField.put("name", "yiwise");
-////        esSearchScrollBO.setFuzzyField(queryField);
-//        Map<String, Object> filterFiled = new HashMap<>();
-//        List<Integer> list = new ArrayList<>();
-//        list.add(8);
-//        list.add(-8);
-//        list.add(2);
-//        filterFiled.put("list", list);
-//        esSearchScrollBO.setFilterFiled(filterFiled);
-//
-//        final Scroll scroll = new Scroll(TimeValue.timeValueSeconds(60L));
-//
-//        SearchResponse response = searchScroll(esSearchScrollBO, scroll);
-//        String scrollId = response.getScrollId();
-//        SearchHit[] searchHits = response.getHits().getHits();
-//
-//        while (searchHits != null && searchHits.length > 0) {
-//            System.out.println("========");
-//            for (SearchHit hit : searchHits) {
-//                System.out.println(hit.getSourceAsString());
-//            }
-//            response = scroll(scroll, scrollId);
-//            searchHits = response.getHits().getHits();
-//            scrollId = response.getScrollId();
-//        }
-//
-//        ClearScrollResponse clearScrollResponse = clearScroll(scrollId);
-//        System.out.println(clearScrollResponse.isSucceeded());
-//        System.out.println(clearScrollResponse.getNumFreed());
-
-//        List<EsMultiSearchBO> list = new ArrayList<>();
-//
-//        EsMultiSearchBO esMultiSearchBO = new EsMultiSearchBO();
-//        esMultiSearchBO.setIndex("yiwise_test");
-//        esMultiSearchBO.setType("person");
-////        Map<String, Object> filterFiled = new HashMap<>();
-////        List<Integer> list = new ArrayList<>();
-////        list.add(8);
-////        list.add(-8);
-////        list.add(2);
-////        filterFiled.put("list", list);
-////        filterFiled.put("tebaDetail.xxxId", 8);
-////        esMultiSearchBO.setFilterFiled(filterFiled);
-//
-//        list.add(esMultiSearchBO);
-//        list.add(esMultiSearchBO);
-//
-//        MultiSearchResponse response = multiSearch(list);
-//        MultiSearchResponse.Item[] responses = response.getResponses();
-//        for (MultiSearchResponse.Item item : responses) {
-//            if (!item.isFailure()) {
-//                SearchResponse searchResponse = item.getResponse();
-//                SearchHit[] hits = searchResponse.getHits().getHits();
-//                for (SearchHit hit : hits) {
-//                    System.out.println(hit.getSourceAsString());
-//                }
-//            }
-//        }
-
         restHighLevelClient.close();
 
     }
@@ -212,90 +133,5 @@ public class ElasticsearchSearch {
         return null;
     }
 
-    /**
-     * 滚动查询-pre
-     * @param esSearchScrollBO
-     * @param scroll
-     * @return
-     */
-    public static SearchResponse searchScroll(EsSearchScrollBO esSearchScrollBO, Scroll scroll) {
-        SearchRequest searchRequest = new SearchRequest(esSearchScrollBO.getIndex());
-        searchRequest.types(esSearchScrollBO.getType());
-        searchRequest.scroll(scroll);
-        SearchSourceBuilder searchSourceBuilder = SearchBuilderUtil.getSearchBuilder(esSearchScrollBO);
-        searchSourceBuilder.size(esSearchScrollBO.getSize());
-        searchRequest.source(searchSourceBuilder);
-        try {
-            SearchResponse response = restHighLevelClient.search(searchRequest, RequestOptions.DEFAULT);
-            return response;
-        } catch (IOException e) {
-            logger.error("启用scroll错误", e);
-        }
-        return null;
-    }
-    /**
-     * 持续滚动
-     * @param scroll
-     * @param scrollId
-     * @return
-     */
-    public static SearchResponse scroll(Scroll scroll, String scrollId) {
-        SearchScrollRequest scrollRequest = new SearchScrollRequest(scrollId);
-        scrollRequest.scroll(scroll);
-        try {
-            SearchResponse response = restHighLevelClient.scroll(scrollRequest, RequestOptions.DEFAULT);
-            return response;
-        } catch (IOException e) {
-            logger.error("滚动scroll错误", e);
-        }
-        return null;
-    }
-    /**
-     * 清理滚动
-     * @param scrollId
-     * @return
-     */
-    public static ClearScrollResponse clearScroll(String scrollId) {
-        ClearScrollRequest request = new ClearScrollRequest();
-        request.addScrollId(scrollId);
-        try {
-            ClearScrollResponse response = restHighLevelClient.clearScroll(request, RequestOptions.DEFAULT);
-            return response;
-        } catch (IOException e) {
-            logger.error("清理scroll错误", e);
-        }
-        return null;
-    }
-
-    public static MultiSearchResponse multiSearch(List<EsMultiSearchBO> list) {
-
-        MultiSearchRequest multiRequest = new MultiSearchRequest();
-        list.forEach(esMultiSearchBO -> {
-            SearchRequest request = new SearchRequest(esMultiSearchBO.getIndex());
-            request.types(esMultiSearchBO.getType());
-
-            SearchSourceBuilder searchSourceBuilder = SearchBuilderUtil.getSearchBuilder(esMultiSearchBO);
-
-            if (esMultiSearchBO.getFrom() != null) {
-                searchSourceBuilder.from(esMultiSearchBO.getFrom());
-            }
-            if (esMultiSearchBO.getSize() != null) {
-                searchSourceBuilder.size(esMultiSearchBO.getSize());
-            }
-
-            request.source(searchSourceBuilder);
-            multiRequest.add(request);
-        });
-
-
-        try {
-            MultiSearchResponse response = restHighLevelClient.msearch(multiRequest, RequestOptions.DEFAULT);
-            return response;
-        } catch (IOException e) {
-            logger.error("es复杂查询错误", e);
-        }
-
-        return null;
-    }
 
 }

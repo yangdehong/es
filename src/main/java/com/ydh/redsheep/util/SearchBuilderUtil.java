@@ -221,8 +221,4 @@ public class SearchBuilderUtil {
     }
 
 
-    public static void main(String[] args) {
-
-    }
-
 }
