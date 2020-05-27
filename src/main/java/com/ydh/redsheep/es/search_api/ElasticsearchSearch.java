@@ -40,10 +40,10 @@ public class ElasticsearchSearch {
 //        esSearchPageBO.setIncludeFields(includeFields);
 //        esSearchPageBO.setExcludeFields(excludeFields);
 
-//        ParamFieldBO termField = new ParamFieldBO();
-//        termField.setFieldName("name.keyword");
-//        termField.setValue("人才3");
-//        esSearchPageBO.setTermField(termField);
+        ParamFieldBO termField = new ParamFieldBO();
+        termField.setFieldName("name.keyword");
+        termField.setValue("人才3");
+        esSearchPageBO.setTermField(termField);
 
 //        ParamFieldBO prefixField = new ParamFieldBO();
 //        prefixField.setFieldName("name.keyword");
@@ -81,10 +81,10 @@ public class ElasticsearchSearch {
 
 //        esSearchPageBO.setExistsField("name1");
 
-        ParamFieldBO regexField = new ParamFieldBO();
-        regexField.setFieldName("address.keyword");
-        regexField.setValue(".*杭州市.*");
-        esSearchPageBO.setRegexpField(regexField);
+//        ParamFieldBO regexField = new ParamFieldBO();
+//        regexField.setFieldName("address.keyword");
+//        regexField.setValue(".*杭州市.*");
+//        esSearchPageBO.setRegexpField(regexField);
 
 
 //        esSearchPageBO.setFilterFiled(filterFiled);
@@ -94,6 +94,7 @@ public class ElasticsearchSearch {
         SearchHits hits = response.getHits();
         for (SearchHit hit : hits) {
             System.out.println(hit.getSourceAsString());
+//            System.out.println(hit.getHighlightFields());
         }
 
 //        EsSearchScrollBO esSearchScrollBO = new EsSearchScrollBO();

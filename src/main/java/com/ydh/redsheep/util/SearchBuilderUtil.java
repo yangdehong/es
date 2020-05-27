@@ -183,6 +183,24 @@ public class SearchBuilderUtil {
 //        }
 //        searchSourceBuilder.query(boolQueryBuilder);
 
+
+//        /*********** 高亮 **********/
+//        HighlightBuilder highlightBuilder = new HighlightBuilder();
+//        // 高亮设置
+//        highlightBuilder.preTags("<span style=\"color:red\">");
+//        highlightBuilder.postTags("</span>");
+//        // 高亮查询字段
+//        highlightBuilder.field("name.keyword");
+////        highlightBuilder.field("sort");
+////        // 如果要多个字段高亮,这项要为false
+////        highlightBuilder.requireFieldMatch(false);
+////        // 下面这两项,如果你要高亮如文字内容等有很多字的字段,必须配置,不然会导致高亮不全,文章内容缺失等
+////        // 最大高亮分片数
+////        highlightBuilder.fragmentSize(800000);
+////        // 从第一个分片获取高亮片段
+////        highlightBuilder.numOfFragments(0);
+//
+//        searchSourceBuilder.highlighter(highlightBuilder);
         return searchSourceBuilder;
 
     }
