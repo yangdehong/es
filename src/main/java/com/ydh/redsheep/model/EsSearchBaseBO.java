@@ -69,13 +69,16 @@ public class EsSearchBaseBO extends EsBaseBO implements Serializable {
      */
     private ParamFieldBO regexpField;
 
-
     /**
-     * bool的条件值，现在只用filter
+     * 复合查询，可以将上面的其他条件都放到复合里面组合起来一起当做条件
      */
+    // and，过滤，不参与打分，所以效率是最高的，其他和must一模一样
     private Map<String, Object> filterFiled;
+    // and，如果有多个条件，这些条件都必须满足 and与
     private Map<String, Object> mustFiled;
+    // and，和must相反，必须都不满足条件才可以匹配到
     private Map<String, Object> notMustFiled;
+    // or，如果有多个条件，满足一个或多个即可
     private Map<String, Object> shouldFiled;
 
 }

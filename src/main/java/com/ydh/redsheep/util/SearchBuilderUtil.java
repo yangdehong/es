@@ -4,12 +4,11 @@ import com.ydh.redsheep.model.EsRangeBO;
 import com.ydh.redsheep.model.EsSearchBaseBO;
 import com.ydh.redsheep.model.ParamFieldBO;
 import com.ydh.redsheep.model.ParamFieldFuzzyBO;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -130,60 +129,6 @@ public class SearchBuilderUtil {
             searchSourceBuilder.query(queryBuilder);
         }
 
-        /************* 多个条件匹配的 ****************/
-//
-//        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-//        Map<String, Object> filterFiled = esSearchBaseBO.getFilterFiled();
-//        if (filterFiled != null) {
-//            for (String key : filterFiled.keySet()) {
-//                Object o = filterFiled.get(key);
-//                if (o instanceof List) {
-//                    List list = (List) o;
-//                    list.forEach(item -> {
-//                        MatchPhraseQueryBuilder filter = QueryBuilders.matchPhraseQuery(key, item);
-//                        boolQueryBuilder.filter(filter);
-//                    });
-//                } else if (o instanceof EsRangeBO) {
-//                    EsRangeBO esRangeBO = (EsRangeBO) o;
-//                    Object minData = esRangeBO.getMinData();
-//                    Object maxData = esRangeBO.getMaxData();
-//                    if (Objects.nonNull(maxData) || Objects.nonNull(minData)) {
-//                        RangeQueryBuilder range = QueryBuilders.rangeQuery(key);
-//                        if (Objects.nonNull(maxData)) {
-//                            range.lt(maxData);
-//                        }
-//                        if (Objects.nonNull(minData)) {
-//                            range.gt(minData);
-//                        }
-//                        boolQueryBuilder.filter(range);
-//                    }
-//                } else {
-//                    MatchPhraseQueryBuilder filter = QueryBuilders.matchPhraseQuery(key, o);
-//                    boolQueryBuilder.filter(filter);
-//                }
-//            }
-//        }
-//        Map<String, Object> shouldFiled = esSearchBaseBO.getShouldFiled();
-//        if (shouldFiled != null) {
-//            BoolQueryBuilder shouldBoolQueryBuilder = QueryBuilders.boolQuery();
-//            for (String key : shouldFiled.keySet()) {
-//                Object o = shouldFiled.get(key);
-//                if (o instanceof List) {
-//                    List list = (List) o;
-//                    list.forEach(item -> {
-//                        MatchPhraseQueryBuilder filter = QueryBuilders.matchPhraseQuery(key, item);
-//                        shouldBoolQueryBuilder.should(filter);
-//                    });
-//                }  else {
-//                    MatchPhraseQueryBuilder filter = QueryBuilders.matchPhraseQuery(key, o);
-//                    shouldBoolQueryBuilder.should(filter);
-//                }
-//            }
-//            boolQueryBuilder.filter(shouldBoolQueryBuilder);
-//        }
-//        searchSourceBuilder.query(boolQueryBuilder);
-
-
 //        /*********** 高亮 **********/
 //        HighlightBuilder highlightBuilder = new HighlightBuilder();
 //        // 高亮设置
@@ -215,6 +160,119 @@ public class SearchBuilderUtil {
 
         // 可用来对一个特定的查询操作中的请求和聚合进行分析
 //        searchSourceBuilder.profile(true);
+
+
+        /************* 复合查询，这里只用matchField作为匹配 ****************/
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        Map<String, Object> filterFiled = esSearchBaseBO.getFilterFiled();
+        if (Objects.nonNull(filterFiled)) {
+            for (String key : filterFiled.keySet()) {
+                Object o = filterFiled.get(key);
+                if (o instanceof List) {
+                    List list = (List) o;
+                    list.forEach(item -> {
+                        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(key, item);
+                        boolQueryBuilder.filter(matchQueryBuilder);
+                    });
+                } else if (o instanceof EsRangeBO) {
+                    EsRangeBO esRangeBO = (EsRangeBO) o;
+                    Object minData = esRangeBO.getMinValue();
+                    Object maxData = esRangeBO.getMaxValue();
+                    if (Objects.nonNull(maxData) || Objects.nonNull(minData)) {
+                        RangeQueryBuilder range = QueryBuilders.rangeQuery(key);
+                        if (Objects.nonNull(maxData)) {
+                            range.lt(maxData);
+                        }
+                        if (Objects.nonNull(minData)) {
+                            range.gt(minData);
+                        }
+                        boolQueryBuilder.filter(range);
+                    }
+                } else {
+                    MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(key, o);
+                    boolQueryBuilder.filter(matchQueryBuilder);
+                }
+            }
+        }
+        Map<String, Object> mustFiled = esSearchBaseBO.getMustFiled();
+        if (Objects.nonNull(mustFiled)) {
+            for (String key : mustFiled.keySet()) {
+                Object o = mustFiled.get(key);
+                if (o instanceof List) {
+                    List list = (List) o;
+                    list.forEach(item -> {
+                        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(key, item);
+                        boolQueryBuilder.filter(matchQueryBuilder);
+                    });
+                } else if (o instanceof EsRangeBO) {
+                    EsRangeBO esRangeBO = (EsRangeBO) o;
+                    Object minData = esRangeBO.getMinValue();
+                    Object maxData = esRangeBO.getMaxValue();
+                    if (Objects.nonNull(maxData) || Objects.nonNull(minData)) {
+                        RangeQueryBuilder range = QueryBuilders.rangeQuery(key);
+                        if (Objects.nonNull(maxData)) {
+                            range.lt(maxData);
+                        }
+                        if (Objects.nonNull(minData)) {
+                            range.gt(minData);
+                        }
+                        boolQueryBuilder.must(range);
+                    }
+                } else {
+                    MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(key, o);
+                    boolQueryBuilder.must(matchQueryBuilder);
+                }
+            }
+        }
+        Map<String, Object> notMustFiled = esSearchBaseBO.getNotMustFiled();
+        if (Objects.nonNull(notMustFiled)) {
+            for (String key : notMustFiled.keySet()) {
+                Object o = notMustFiled.get(key);
+                if (o instanceof List) {
+                    List list = (List) o;
+                    list.forEach(item -> {
+                        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(key, item);
+                        boolQueryBuilder.filter(matchQueryBuilder);
+                    });
+                } else if (o instanceof EsRangeBO) {
+                    EsRangeBO esRangeBO = (EsRangeBO) o;
+                    Object minData = esRangeBO.getMinValue();
+                    Object maxData = esRangeBO.getMaxValue();
+                    if (Objects.nonNull(maxData) || Objects.nonNull(minData)) {
+                        RangeQueryBuilder range = QueryBuilders.rangeQuery(key);
+                        if (Objects.nonNull(maxData)) {
+                            range.lt(maxData);
+                        }
+                        if (Objects.nonNull(minData)) {
+                            range.gt(minData);
+                        }
+                        boolQueryBuilder.mustNot(range);
+                    }
+                } else {
+                    MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(key, o);
+                    boolQueryBuilder.mustNot(matchQueryBuilder);
+                }
+            }
+        }
+        Map<String, Object> shouldFiled = esSearchBaseBO.getShouldFiled();
+        if (Objects.nonNull(shouldFiled)) {
+            BoolQueryBuilder shouldBoolQueryBuilder = QueryBuilders.boolQuery();
+            for (String key : shouldFiled.keySet()) {
+                Object o = shouldFiled.get(key);
+                if (o instanceof List) {
+                    List list = (List) o;
+                    list.forEach(item -> {
+                        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(key, item);
+                        shouldBoolQueryBuilder.should(matchQueryBuilder);
+                    });
+                }  else {
+                    MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(key, o);
+                    shouldBoolQueryBuilder.should(matchQueryBuilder);
+                }
+            }
+            boolQueryBuilder.filter(shouldBoolQueryBuilder);
+        }
+        searchSourceBuilder.query(boolQueryBuilder);
 
         return searchSourceBuilder;
 
