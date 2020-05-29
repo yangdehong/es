@@ -26,5 +26,4 @@ public class EsMultiSearchBO extends EsSearchBaseBO implements Serializable {
     private Integer size = 20;
 
 
-
 }

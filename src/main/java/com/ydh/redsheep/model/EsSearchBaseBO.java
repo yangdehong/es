@@ -70,16 +70,6 @@ public class EsSearchBaseBO extends EsBaseBO implements Serializable {
     private ParamFieldBO regexpField;
 
 
-
-
-
-
-
-
-
-
-
-
     /**
      * bool的条件值，现在只用filter
      */
@@ -87,6 +77,5 @@ public class EsSearchBaseBO extends EsBaseBO implements Serializable {
     private Map<String, Object> mustFiled;
     private Map<String, Object> notMustFiled;
     private Map<String, Object> shouldFiled;
-
 
 }
