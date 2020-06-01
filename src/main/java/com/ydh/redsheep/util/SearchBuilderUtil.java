@@ -171,8 +171,7 @@ public class SearchBuilderUtil {
                 if (o instanceof List) {
                     List list = (List) o;
                     list.forEach(item -> {
-                        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(key, item);
-                        boolQueryBuilder.filter(matchQueryBuilder);
+                        boolQueryBuilder.filter(QueryBuilders.matchQuery(key, item));
                     });
                 } else if (o instanceof EsRangeBO) {
                     EsRangeBO esRangeBO = (EsRangeBO) o;
@@ -189,8 +188,7 @@ public class SearchBuilderUtil {
                         boolQueryBuilder.filter(range);
                     }
                 } else {
-                    MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(key, o);
-                    boolQueryBuilder.filter(matchQueryBuilder);
+                    boolQueryBuilder.filter(QueryBuilders.matchQuery(key, o));
                 }
             }
         }
@@ -201,26 +199,10 @@ public class SearchBuilderUtil {
                 if (o instanceof List) {
                     List list = (List) o;
                     list.forEach(item -> {
-                        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(key, item);
-                        boolQueryBuilder.filter(matchQueryBuilder);
+                        boolQueryBuilder.must(QueryBuilders.matchQuery(key, item));
                     });
-                } else if (o instanceof EsRangeBO) {
-                    EsRangeBO esRangeBO = (EsRangeBO) o;
-                    Object minData = esRangeBO.getMinValue();
-                    Object maxData = esRangeBO.getMaxValue();
-                    if (Objects.nonNull(maxData) || Objects.nonNull(minData)) {
-                        RangeQueryBuilder range = QueryBuilders.rangeQuery(key);
-                        if (Objects.nonNull(maxData)) {
-                            range.lt(maxData);
-                        }
-                        if (Objects.nonNull(minData)) {
-                            range.gt(minData);
-                        }
-                        boolQueryBuilder.must(range);
-                    }
                 } else {
-                    MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(key, o);
-                    boolQueryBuilder.must(matchQueryBuilder);
+                    boolQueryBuilder.must(QueryBuilders.matchQuery(key, o));
                 }
             }
         }
@@ -231,46 +213,26 @@ public class SearchBuilderUtil {
                 if (o instanceof List) {
                     List list = (List) o;
                     list.forEach(item -> {
-                        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(key, item);
-                        boolQueryBuilder.filter(matchQueryBuilder);
+                        boolQueryBuilder.mustNot(QueryBuilders.matchQuery(key, item));
                     });
-                } else if (o instanceof EsRangeBO) {
-                    EsRangeBO esRangeBO = (EsRangeBO) o;
-                    Object minData = esRangeBO.getMinValue();
-                    Object maxData = esRangeBO.getMaxValue();
-                    if (Objects.nonNull(maxData) || Objects.nonNull(minData)) {
-                        RangeQueryBuilder range = QueryBuilders.rangeQuery(key);
-                        if (Objects.nonNull(maxData)) {
-                            range.lt(maxData);
-                        }
-                        if (Objects.nonNull(minData)) {
-                            range.gt(minData);
-                        }
-                        boolQueryBuilder.mustNot(range);
-                    }
                 } else {
-                    MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(key, o);
-                    boolQueryBuilder.mustNot(matchQueryBuilder);
+                    boolQueryBuilder.mustNot(QueryBuilders.matchQuery(key, o));
                 }
             }
         }
         Map<String, Object> shouldFiled = esSearchBaseBO.getShouldFiled();
         if (Objects.nonNull(shouldFiled)) {
-            BoolQueryBuilder shouldBoolQueryBuilder = QueryBuilders.boolQuery();
             for (String key : shouldFiled.keySet()) {
                 Object o = shouldFiled.get(key);
                 if (o instanceof List) {
                     List list = (List) o;
                     list.forEach(item -> {
-                        MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(key, item);
-                        shouldBoolQueryBuilder.should(matchQueryBuilder);
+                        boolQueryBuilder.should(QueryBuilders.matchQuery(key, item));
                     });
                 }  else {
-                    MatchQueryBuilder matchQueryBuilder = QueryBuilders.matchQuery(key, o);
-                    shouldBoolQueryBuilder.should(matchQueryBuilder);
+                    boolQueryBuilder.should(QueryBuilders.matchQuery(key, o));
                 }
             }
-            boolQueryBuilder.filter(shouldBoolQueryBuilder);
         }
         searchSourceBuilder.query(boolQueryBuilder);
 

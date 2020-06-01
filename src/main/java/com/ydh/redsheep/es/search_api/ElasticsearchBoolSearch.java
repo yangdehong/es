@@ -1,5 +1,6 @@
 package com.ydh.redsheep.es.search_api;
 
+import com.ydh.redsheep.model.EsRangeBO;
 import com.ydh.redsheep.model.EsSearchPageBO;
 import com.ydh.redsheep.util.ElasticsearchConfig;
 import com.ydh.redsheep.util.SearchBuilderUtil;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,25 +32,29 @@ public class ElasticsearchBoolSearch {
         esSearchPageBO.setFrom(0);
         esSearchPageBO.setSize(10);
 
-//        Map<String, Object> filterFiled = new HashMap<>();
-//        filterFiled.put("name", "人才3");
-//        filterFiled.put("email", "2680266117436425216@qq.com");
-//        esSearchPageBO.setFilterFiled(filterFiled);
+        Map<String, Object> filterFiled = new HashMap<>();
+//        filterFiled.put("name", "3");
+//        filterFiled.put("email.keyword", "2680266117436425216@qq.com");
+        EsRangeBO esRangeBO = new EsRangeBO();
+        esRangeBO.setMaxValue(LocalDateTime.now());
+        esRangeBO.setMinValue(LocalDateTime.of(2020, 5, 25, 0, 0));
+        filterFiled.put("birthDay", esRangeBO);
+        esSearchPageBO.setFilterFiled(filterFiled);
 
 //        Map<String, Object> mustFiled = new HashMap<>();
-//        mustFiled.put("name", "人才3");
+//        mustFiled.put("name", "才3");
 //        mustFiled.put("email", "2680266117436425216@qq.com");
 //        esSearchPageBO.setMustFiled(mustFiled);
 
 //        Map<String, Object> mustNotField = new HashMap<>();
-//        mustNotField.put("name", "人才3");
-//        mustNotField.put("email", "2680266117436425216@qq.com");
+//        mustNotField.put("name", "3");
+////        mustNotField.put("email", "2680266117436425216@qq.com");
 //        esSearchPageBO.setNotMustFiled(mustNotField);
 
-        Map<String, Object> shouldField = new HashMap<>();
-        shouldField.put("name", "人才3");
-        shouldField.put("email", "2680266117436425216@qq.com");
-        esSearchPageBO.setShouldFiled(shouldField);
+//        Map<String, Object> shouldField = new HashMap<>();
+//        shouldField.put("name", "3");
+//        shouldField.put("email", "1779048719887237034@qq.com");
+//        esSearchPageBO.setShouldFiled(shouldField);
 
         SearchResponse response = searchCondition(esSearchPageBO);
         SearchHits hits = response.getHits();
