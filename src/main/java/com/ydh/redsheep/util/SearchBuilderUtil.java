@@ -163,6 +163,7 @@ public class SearchBuilderUtil {
 
 
         /************* 复合查询，这里只用matchField作为匹配 ****************/
+        // BoolQueryBuilder中除了可以加下面这些条件以外，还是可以直接加BoolQueryBuilder类型的条件的，这里不做距离
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
         Map<String, Object> filterFiled = esSearchBaseBO.getFilterFiled();
         if (Objects.nonNull(filterFiled)) {
