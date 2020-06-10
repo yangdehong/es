@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 public class ElasticsearchReIndex {
 
-    private static Logger logger = LoggerFactory.getLogger(ElasticsearchMultiDocumentMain.class);
+    private static Logger logger = LoggerFactory.getLogger(ElasticsearchMultiDocument.class);
 
     private static RestHighLevelClient restHighLevelClient = ElasticsearchConfig.restHighLevelClient();
 

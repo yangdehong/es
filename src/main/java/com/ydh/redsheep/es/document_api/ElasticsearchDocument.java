@@ -29,9 +29,9 @@ import java.util.Random;
 * @author : yangdehong
 * @date : 2019-08-28 17:25
 */
-public class ElasticsearchDocumentMain {
+public class ElasticsearchDocument {
 
-    private static Logger logger = LoggerFactory.getLogger(ElasticsearchDocumentMain.class);
+    private static Logger logger = LoggerFactory.getLogger(ElasticsearchDocument.class);
 
     private static RestHighLevelClient restHighLevelClient = ElasticsearchConfig.restHighLevelClient();
 

@@ -39,9 +39,9 @@ import java.util.*;
 * @author : yangdehong
 * @date : 2019-08-28 17:25
 */
-public class ElasticsearchMultiDocumentMain {
+public class ElasticsearchMultiDocument {
 
-    private static Logger logger = LoggerFactory.getLogger(ElasticsearchMultiDocumentMain.class);
+    private static Logger logger = LoggerFactory.getLogger(ElasticsearchMultiDocument.class);
 
     private static RestHighLevelClient restHighLevelClient = ElasticsearchConfig.restHighLevelClient();
 
