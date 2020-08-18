@@ -1,5 +1,6 @@
 package com.ydh.redsheep.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -8,40 +9,51 @@ import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.core.convert.support.DefaultConversionService;
+import org.springframework.data.convert.ReadingConverter;
+import org.springframework.data.convert.WritingConverter;
+import org.springframework.data.elasticsearch.config.AbstractElasticsearchConfiguration;
+import org.springframework.data.elasticsearch.core.ElasticsearchEntityMapper;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.EntityMapper;
+import org.springframework.data.elasticsearch.core.convert.ElasticsearchCustomConversions;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.Date;
 
 /**
  * @author : yangdehong
  * @date : 2019-08-28 13:39
  */
-public class ElasticsearchConfig {
+@Slf4j
+@Configuration
+public class ElasticsearchConfig extends AbstractElasticsearchConfiguration {
 
-    private static Logger logger = LoggerFactory.getLogger(ElasticsearchConfig.class);
+    private String hostname = "es-cn-0pp1a4ci2000907e4.public.elasticsearch.aliyuncs.com";
+    private Integer port = 9200;
+    private String username = "elastic";
+    private String password = "oN6vbqaaKlYsjAin";
 
-    private static String hostname = "es-cn-0pp1a4ci2000907e4.public.elasticsearch.aliyuncs.com";
-    private static Integer port = 9200;
-    private static String username = "elastic";
-    private static String password = "oN6vbqaaKlYsjAin";
-
-
-    public static RestClient restClient() {
-
-        RestClient restClient = getRestClientBuilder().build();
-
-        return restClient;
+    @Bean
+    public ElasticsearchRestTemplate elasticsearchTemplate() {
+        return new ElasticsearchRestTemplate(elasticsearchClient());
     }
 
-    public static RestHighLevelClient restHighLevelClient() {
-
+    @Override
+    @Bean(name = "restHighLevelClient")
+    public RestHighLevelClient elasticsearchClient() {
         RestHighLevelClient restHighLevelClient = new RestHighLevelClient(getRestClientBuilder());
-
-        logger.info("正在使用es的restHighLevelClient的api");
-
+        log.info("正在使用es的restHighLevelClient的api");
         return restHighLevelClient;
     }
 
-    private static RestClientBuilder getRestClientBuilder() {
+    private RestClientBuilder getRestClientBuilder() {
         final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
 
@@ -57,6 +69,50 @@ public class ElasticsearchConfig {
         return restClientBuilder;
     }
 
+    @Bean
+    @Override
+    public EntityMapper entityMapper() {
 
+        ElasticsearchEntityMapper entityMapper = new ElasticsearchEntityMapper(
+                elasticsearchMappingContext(), new DefaultConversionService()
+        );
+        entityMapper.setConversions(elasticsearchCustomConversions());
 
+        return entityMapper;
+    }
+
+    @Bean
+    @Override
+    public ElasticsearchCustomConversions elasticsearchCustomConversions() {
+        return new ElasticsearchCustomConversions(
+                Arrays.asList(new LocalDateTimeToDateConverter(), new DateToLocalDateTimeConverter(),
+                        new LongToLocalDateTimeConverter()));
+    }
+
+    @WritingConverter
+    static class LocalDateTimeToDateConverter implements Converter<LocalDateTime, Date> {
+
+        @Override
+        public Date convert(LocalDateTime localDateTime) {
+            return new Date();
+        }
+    }
+
+    @ReadingConverter
+    static class DateToLocalDateTimeConverter implements Converter<Date, LocalDateTime> {
+
+        @Override
+        public LocalDateTime convert(Date date) {
+            return LocalDateTime.now();
+        }
+    }
+
+    @ReadingConverter
+    static class LongToLocalDateTimeConverter implements Converter<Long, LocalDateTime> {
+
+        @Override
+        public LocalDateTime convert(Long date) {
+            return LocalDateTime.ofInstant(Instant.ofEpochMilli(date), ZoneId.systemDefault());
+        }
+    }
 }
